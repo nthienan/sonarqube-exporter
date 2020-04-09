@@ -46,7 +46,7 @@ def parse_opts(args):
     parser.add_argument("--ignore-ssl-verification", dest="ignore_ssl", action="store_false")
     parser.add_argument("--log-level", env="SQE_LOG_LEVEL", default="INFO", dest="log_level", action=EnvAction,
                         help="Log level. It can be DEBUG, INFO, WARNING, ERROR, CRITICAL. Default is INFO")
-    parser.add_argument("--port", "-p", env="SQE_PORT", default=8998, dest="port", action=EnvAction,
+    parser.add_argument("--port", "-p", env="SQE_PORT", default=8999, dest="port", action=EnvAction,
                         help="The port that SQE will listen on. Default is 8999")
 
     return parser.parse_args(args)
