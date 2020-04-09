@@ -144,9 +144,11 @@ class SonarQubeCollector:
 
     def __init__(self, sonar_client : SonarQubeClient):
         self._sonar_client = sonar_client
-        self._cached = []
 
     def run(self):
+        logging.info("Running...")
+
+    def collect(self):
         projects = get_all_projects_with_metrics(self._sonar_client)
         new_data = []
         for project in projects:
@@ -175,13 +177,7 @@ class SonarQubeCollector:
                     labels=label_values,
                     value=value_to_set
                 )
-                new_data.extend(gauge.collect())
-        self._cached = new_data
-        logging.info(new_data)
-        logging.info(self._cached)
-
-    def collect(self):
-        return self._cached
+                yield gauge
 
 
 def get_all_projects_with_metrics(sonar_client):
