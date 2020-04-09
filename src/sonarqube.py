@@ -14,7 +14,7 @@ class SonarQubeClient:
             url = url[:-1]
         self._url = url
         self._user_token = user_token
-        self._basic_authen = base64.b64encode(("{}:" % self._user_token).encode('ascii')).decode('ascii')
+        self._basic_authen = base64.b64encode(("%s:" % self._user_token).encode('ascii')).decode('ascii')
         self._authenticate_header = {"Authorization": "Basic %s" % self._basic_authen}
         self._kwargs = kwargs
         logging.debug("Initialized SonarQube: url: %s, userToken: ****, %s" % (self._url, self._kwargs))
