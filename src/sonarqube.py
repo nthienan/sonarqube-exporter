@@ -1,6 +1,6 @@
 import requests
 import logging
-from config import Config
+from .config import Config
 from prometheus_client.core import GaugeMetricFamily
 
 
