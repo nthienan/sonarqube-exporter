@@ -1,0 +1,31 @@
+sudo: required
+language: python3.8
+services:
+  - docker
+env:
+  global:
+    - IMAGE_NAME=nthienan/sonarqube-exporter
+    - VERSION=0.1.0
+install: true
+
+before_script:
+  - docker pull $IMAGE_NAME || true
+script:
+  - pip install -r requirements-dev.txt
+  - coverage run -m xmlrunner discover -s tests -o build/unittest-reports
+  - docker build --pull --cache-from $IMAGE_NAME --tag $IMAGE_NAME .
+after_success:
+  - docker images
+
+before_deploy:
+  - pip install docker-ci-deploy
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+deploy:
+  - provider: script
+    script: dcd --version $VERSION --version-semver --version-latest --verbose $IMAGE_NAME
+    on:
+      branch: master
+  - provider: script
+    script: dcd --version $(git rev-parse --short HEAD) --verbose $IMAGE_NAME
+    on:
+      all_branches: true

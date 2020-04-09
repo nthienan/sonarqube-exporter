@@ -1,0 +1,4 @@
+argparse==1.4.0
+requests==2.22.0
+prometheus-client==0.7.1
+apscheduler==3.6.3
