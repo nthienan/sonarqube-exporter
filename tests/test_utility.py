@@ -1,5 +1,4 @@
 import unittest
-from src import utility
 
 
 class SampleTest(unittest.TestCase):
