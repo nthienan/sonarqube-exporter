@@ -65,7 +65,7 @@ def main():
     signal.signal(signal.SIGTERM, sigterm_handler)
 
     sonarqube_client = SonarQubeClient(opts.url, opts.user_token, **{"verify": opts.ignore_ssl})
-    sonar_collector = SonarQubeCollector()
+    sonar_collector = SonarQubeCollector(sonarqube_client)
     REGISTRY.register(sonar_collector)
 
     scheduler.schedule(sonar_collector, int(opts.interval))
