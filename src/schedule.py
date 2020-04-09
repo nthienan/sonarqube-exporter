@@ -7,15 +7,15 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 class Scheduler:
     def __init__(self):
-        logging.info("Initial scheduler")
+        logging.info("Initialize scheduler")
         self._scheduler = BackgroundScheduler()
         self._is_running = False
 
     def schedule(self, executor, interval):
         trigger = IntervalTrigger(seconds=interval)
         if trigger:
-            logging.info("Scheduling jae-executor...")
-            self._scheduler.add_job(func=executor.run, trigger=trigger, name="jae-collector")
+            logging.info("Scheduling sqe-executor...")
+            self._scheduler.add_job(func=executor.run, trigger=trigger, name="sqe-collector")
 
     def start(self):
         logging.info("Scheduler is starting...")

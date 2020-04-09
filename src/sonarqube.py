@@ -176,6 +176,8 @@ class SonarQubeCollector:
                 )
                 new_data.extend(gauge.collect())
         self._cached = new_data
+        logging.info(new_data)
+        logging.info(self._cached)
 
     def collect(self):
         return self._cached
