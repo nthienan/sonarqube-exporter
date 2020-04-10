@@ -166,13 +166,15 @@ class SonarQubeCollector:
                     else:
                         label_list.append(metric_value[0])
                         label_values.append(metric_value[1])
-
+                logging.info("***********")
+                logging.info("metric key: %s" % metric.key)
                 gauge = GaugeMetricFamily(
                     name="sonar_{}".format(metric.key),
                     documentation=metric.description,
                     labels=label_list
                 )
-
+                logging.info("label_values: %s" % label_values)
+                logging.info("value_to_set: %s" % value_to_set)
                 gauge.add_metric(
                     labels=label_values,
                     value=value_to_set

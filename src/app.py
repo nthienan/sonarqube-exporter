@@ -67,7 +67,8 @@ def main():
     sonarqube_client = SonarQubeClient(opts.url, opts.user_token, **{"verify": opts.ignore_ssl})
     sonar_collector = SonarQubeCollector(sonarqube_client)
     REGISTRY.register(sonar_collector)
-
+    loggin.info("---------------------------------")
+    loggin.info(sonar_collector.collect())
     scheduler.schedule(sonar_collector, int(opts.interval))
     scheduler.start()
 
