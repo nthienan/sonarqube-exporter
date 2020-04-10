@@ -70,6 +70,7 @@ class Project:
     def organize_measures(self, metrics : list):
         metric_obj_list = []
         for metric in self.metrics['component']['measures']:
+            logging.info("metric: %s" % metric)
             if 'metric' in metric:
                 m = Metric()
                 tuple_list = []
@@ -152,7 +153,9 @@ class SonarQubeCollector:
         projects = get_all_projects_with_metrics(self._sonar_client)
         new_data = []
         for project in projects:
+            logging.info("project: %s" % project)
             for metric in project.metrics:
+                logging.info("metric: %s" % metric)
                 label_list = ['id', 'key', 'name']
                 label_values = []
                 value_to_set = None
@@ -161,6 +164,7 @@ class SonarQubeCollector:
                 label_values.append(project.key)
                 label_values.append(project.name)
                 for metric_value in metric.values:
+                    logging.info("metric_value: %s" % metric_value)
                     if metric_value[0] == 'value':
                         value_to_set = metric_value[1]
                     else:
