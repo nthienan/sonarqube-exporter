@@ -173,6 +173,7 @@ class SonarQubeCollector:
                     documentation=metric.description,
                     labels=label_list
                 )
+                logging.info("label_list: %s" % label_list)
                 logging.info("label_values: %s" % label_values)
                 logging.info("value_to_set: %s" % value_to_set)
                 gauge.add_metric(
