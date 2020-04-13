@@ -89,7 +89,7 @@ class SonarQubeCollector:
     def __init__(self, sonar_client : SonarQubeClient):
         self._sonar_client = sonar_client
         self._cached_metrics = []
-        
+
         # initialize gauges
         self._metrics = {}
         raw_metrics = self._sonar_client.get_all_metrics()['metrics']
@@ -104,19 +104,16 @@ class SonarQubeCollector:
                         metric.description = raw_metric['description']
                     else:
                         metric.description = raw_metric['name']
-                    logging.info("metric: %s " % metric.key)
                     self._metrics[metric.key] = metric
-        logging.info("size: %s "% len(self._metrics.keys()))
         self._queried_metrics = str()
         self._gauges = {}
         for key, m in self._metrics.items():
             self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=('id', 'key', 'name', 'domain', 'type'))
             self._queried_metrics = "{},{}".format(m.key, self._queried_metrics)
-        logging.info("finished...")
 
     def collect(self):
-         return self._cached_metrics
-    
+        return self._cached_metrics
+
     def run(self):
         projects  = self._sonar_client.get_all_projects()['components']
         for p in projects:
@@ -125,9 +122,8 @@ class SonarQubeCollector:
                 m = self._metrics[measure['metric']]
                 gauge = self._gauges[measure['metric']]
                 gauge.labels(p['id'], p['key'], p['name'], m.domain, m.type).set(measure['value'])
-        
+
         data = []
         for key, g in self._gauges.items():
             data.extend(g.collect())
         self._cached_metrics = data
-        return self._cached_metrics
