@@ -4,6 +4,7 @@ import os
 import signal
 import sys
 from argparse import Action
+import time
 
 from prometheus_client import REGISTRY, start_http_server
 
@@ -55,7 +56,6 @@ def parse_opts(args):
 def main():
     opts = parse_opts(sys.argv[1:])
     init_logger(opts.log_level)
-
     scheduler = Scheduler()
 
     def sigterm_handler(signum, frame):
@@ -67,8 +67,6 @@ def main():
     sonarqube_client = SonarQubeClient(opts.url, opts.user_token, **{"verify": opts.ignore_ssl})
     sonar_collector = SonarQubeCollector(sonarqube_client)
     REGISTRY.register(sonar_collector)
-    logging.info("---------------------------------")
-    logging.info(sonar_collector.collect())
     scheduler.schedule(sonar_collector, int(opts.interval))
     scheduler.start()
 

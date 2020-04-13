@@ -1,7 +1,7 @@
 import requests
 import logging
 from .config import Config
-from prometheus_client.core import GaugeMetricFamily
+from prometheus_client.core import Gauge
 import base64
 
 
@@ -34,72 +34,6 @@ class SonarQubeClient:
         return self._request(endpoint="api/measures/component?component={}&metricKeys={}".format(component_key, metric_key))
 
 
-class Project:
-
-    def __init__(self, identifier, key):
-        self.id = identifier
-        self.key = key
-        self._metrics = None
-        self._name = None
-        self._organization = None
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, value):
-        self._name = value
-
-    @property
-    def metrics(self):
-        return self._metrics
-
-    @metrics.setter
-    def metrics(self, value):
-        self._metrics = value
-
-    @property
-    def organization(self):
-        return self._organization
-
-    @organization.setter
-    def organization(self, value):
-        self._organization = value
-
-    def organize_measures(self, metrics : list):
-        metric_obj_list = []
-        for metric in self.metrics['component']['measures']:
-            logging.info("metric: %s" % metric)
-            if 'metric' in metric:
-                m = Metric()
-                tuple_list = []
-                for metric_obj in metrics:
-                    if metric_obj.key == metric['metric']:
-                        m.key = metric_obj.key
-                        m.description = metric_obj.description
-                        m.domain = metric_obj.domain
-                for met_tuples in self.transform_object_in_list_tuple(metric):
-                    if met_tuples[0] == 'metric':
-                        m.key = met_tuples[1]
-                    else:
-                        tuple_list.append(met_tuples)
-                m.values = tuple_list
-            metric_obj_list.append(m)
-        self.metrics = metric_obj_list
-
-    def transform_object_in_list_tuple(self, metric_object):
-        object_list_tuples = []
-        for item in metric_object:
-            if isinstance(metric_object[item], list):
-                for obj in metric_object[item]:
-                    object_list_tuples.extend(self.transform_object_in_list_tuple(metric_object=obj))
-            else:
-                obj_tuple = (str(item), str(metric_object[item]))
-                object_list_tuples.append(obj_tuple)
-        return object_list_tuples
-
-
 class Metric:
 
     def __init__(self):
@@ -107,6 +41,7 @@ class Metric:
         self._values = []
         self._description = None
         self._domain = None
+        self._type = None
 
     @property
     def key(self):
@@ -140,81 +75,59 @@ class Metric:
     def domain(self, value):
         self._domain = value
 
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = value
+
 
 class SonarQubeCollector:
 
     def __init__(self, sonar_client : SonarQubeClient):
         self._sonar_client = sonar_client
-
-    def run(self):
-        logging.info("Running...")
+        self._cached_metrics = []
+        
+        # initialize gauges
+        self._metrics = {}
+        raw_metrics = self._sonar_client.get_all_metrics()['metrics']
+        for raw_metric in raw_metrics:
+            metric = Metric()
+            for supported_m in CONF.supported_keys:
+                if 'domain' in raw_metric and raw_metric['domain'] == supported_m["domain"] and raw_metric['key'] in supported_m['keys']:
+                    metric.domain = raw_metric['domain']
+                    metric.key = raw_metric['key']
+                    metric.type = raw_metric['type']
+                    if 'description' in raw_metric:
+                        metric.description = raw_metric['description']
+                    else:
+                        metric.description = raw_metric['name']
+                    logging.info("metric: %s " % metric.key)
+                    self._metrics[metric.key] = metric
+        logging.info("size: %s "% len(self._metrics.keys()))
+        self._queried_metrics = str()
+        self._gauges = {}
+        for key, m in self._metrics.items():
+            self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=('id', 'key', 'name', 'domain', 'type'))
+            self._queried_metrics = "{},{}".format(m.key, self._queried_metrics)
+        logging.info("finished...")
 
     def collect(self):
-        projects = get_all_projects_with_metrics(self._sonar_client)
-        new_data = []
-        for project in projects:
-            logging.info("project: %s" % project)
-            for metric in project.metrics:
-                logging.info("metric: %s" % metric)
-                label_list = ['id', 'key', 'name']
-                label_values = []
-                value_to_set = None
-
-                label_values.append(project.id)
-                label_values.append(project.key)
-                label_values.append(project.name)
-                for metric_value in metric.values:
-                    logging.info("metric_value: %s" % metric_value)
-                    if metric_value[0] == 'value':
-                        value_to_set = metric_value[1]
-                    else:
-                        label_list.append(metric_value[0])
-                        label_values.append(metric_value[1])
-                logging.info("***********")
-                logging.info("metric key: %s" % metric.key)
-                gauge = GaugeMetricFamily(
-                    name="sonar_{}".format(metric.key),
-                    documentation=metric.description,
-                    labels=label_list
-                )
-                logging.info("label_list: %s" % label_list)
-                logging.info("label_values: %s" % label_values)
-                logging.info("value_to_set: %s" % value_to_set)
-                gauge.add_metric(
-                    labels=label_values,
-                    value=value_to_set
-                )
-                yield gauge
-
-
-def get_all_projects_with_metrics(sonar_client):
-    projects = []
-    metrics = []
-    all_projects = sonar_client.get_all_projects()
-    all_metrics = sonar_client.get_all_metrics()
-
-    for metric in all_metrics['metrics']:
-        m = Metric()
-        for item in CONF.supported_keys:
-            if 'domain' in metric and metric['domain'] in item['domain']:
-                if 'key' in metric and metric['key'] in item['keys']:
-                    m.key = metric['key']
-                    m.domain = metric['domain']
-                    if 'description' in metric:
-                        m.description = metric['description']
-                    metrics.append(m)
-
-    metrics_comma_separated = str()
-    for metric in metrics:
-        if metric.description:
-            metrics_comma_separated = "{},{}".format(metric.key, metrics_comma_separated)
-
-    for project in all_projects['components']:
-        p = Project(identifier=project['id'], key=project['key'])
-        p.name = project['name']
-        p.organization = project['organization']
-        p.metrics = sonar_client.get_measures_component(component_key=p.key, metric_key=metrics_comma_separated)
-        p.organize_measures(metrics)
-        projects.append(p)
-
-    return projects
+         return self._cached_metrics
+    
+    def run(self):
+        projects  = self._sonar_client.get_all_projects()['components']
+        for p in projects:
+            measures = self._sonar_client.get_measures_component(component_key=p['key'], metric_key=self._queried_metrics)['component']['measures']
+            for measure in measures:
+                m = self._metrics[measure['metric']]
+                gauge = self._gauges[measure['metric']]
+                gauge.labels(p['id'], p['key'], p['name'], m.domain, m.type).set(measure['value'])
+        
+        data = []
+        for key, g in self._gauges.items():
+            data.extend(g.collect())
+        self._cached_metrics = data
+        return self._cached_metrics
