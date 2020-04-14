@@ -47,6 +47,7 @@ SUPPORTED_KEYS = [
     {
         "domain" : "Coverage",
         "keys" : [
+            "coverage",
             "branch_coverage",
             "conditions_to_cover",
             "executable_lines_data",
