@@ -21,6 +21,6 @@ optional arguments:
 ```
 Docker:
 ```bash
-docker run -d -p 8998:8998 nthienan/sonarqube-exporter --storage-info --users --url https://sonarqube.example.com --access-token <ACCESS_TOKEN>
+docker run -d -p 8999:8999 nthienan/sonarqube-exporter --storage-info --users --url https://sonarqube.example.com --user-token <USER_TOKEN>
 ```
 Metrics:

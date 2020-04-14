@@ -16,6 +16,7 @@ SUPPORTED_KEYS = [
     {
         "domain" : "Security",
         "keys" : [
+            "vulnerabilities",
             "security_hotspots",
             "security_rating",
             "security_remediation_effort",
