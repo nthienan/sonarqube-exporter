@@ -111,7 +111,7 @@ SUPPORTED_KEYS = [
         ],
         "tranformKeys": {
             "alert_status": {
-                "OK": 0
+                "OK": 0,
                 "ERROR": 1
             }
         }
