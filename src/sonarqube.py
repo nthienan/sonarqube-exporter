@@ -94,7 +94,7 @@ class Metric:
         self._tranform = value
 
     @property
-    def _tranform_map(self):
+    def tranform_map(self):
         return self._tranform_map
 
     @tranform_map.setter
