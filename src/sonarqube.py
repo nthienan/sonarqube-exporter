@@ -86,7 +86,7 @@ class Metric:
         self._type = value
 
     @property
-    def tranfrom(self):
+    def tranform(self):
         return self._tranform
 
     @tranform.setter
