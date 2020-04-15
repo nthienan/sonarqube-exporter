@@ -55,9 +55,8 @@ SUPPORTED_KEYS = [
             "lines_to_cover",
             "skipped_tests",
             "uncovered_conditions",
-            "test_failures,tests",
+            "test_failures",
             "test_errors",
-            "skipped_tests",
             "test_success_density",
             "test_execution_time"
         ]
