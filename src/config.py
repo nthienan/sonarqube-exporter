@@ -6,16 +6,16 @@ class Config:
 
 SUPPORTED_KEYS = [
     {
-        "domain" : "Reliability",
-        "keys" : [
+        "domain": "Reliability",
+        "keys": [
             "bugs",
             "reliability_rating",
             "reliability_remediation_effort"
         ]
     },
     {
-        "domain" : "Security",
-        "keys" : [
+        "domain": "Security",
+        "keys": [
             "vulnerabilities",
             "security_hotspots",
             "security_rating",
@@ -24,8 +24,8 @@ SUPPORTED_KEYS = [
         ]
     },
     {
-        "domain" : "Maintainability",
-        "keys" : [
+        "domain": "Maintainability",
+        "keys": [
             "code_smells",
             "development_cost",
             "effort_to_reach_maintainability_rating_a",
@@ -35,8 +35,8 @@ SUPPORTED_KEYS = [
         ]
     },
     {
-        "domain" : "Duplications",
-        "keys" : [
+        "domain": "Duplications",
+        "keys": [
             "duplicated_blocks",
             "duplicated_files",
             "duplicated_lines",
@@ -45,8 +45,8 @@ SUPPORTED_KEYS = [
         ]
     },
     {
-        "domain" : "Coverage",
-        "keys" : [
+        "domain": "Coverage",
+        "keys": [
             "coverage",
             "branch_coverage",
             "conditions_to_cover",
@@ -62,8 +62,8 @@ SUPPORTED_KEYS = [
         ]
     },
     {
-        "domain" : "Size",
-        "keys" : [
+        "domain": "Size",
+        "keys": [
             "classes",
             "comment_lines",
             "comment_lines_data",
@@ -81,8 +81,8 @@ SUPPORTED_KEYS = [
         ]
     },
     {
-        "domain" : "Issues",
-        "keys" : [
+        "domain": "Issues",
+        "keys": [
             "violations",
             "open_issues",
             "reopened_issues",
@@ -92,8 +92,8 @@ SUPPORTED_KEYS = [
         ]
     },
     {
-        "domain" : "Complexity",
-        "keys" : [
+        "domain": "Complexity",
+        "keys": [
             "complexity",
             "cognitive_complexity",
             "class_complexity",
@@ -104,10 +104,16 @@ SUPPORTED_KEYS = [
         ]
     },
     {
-        "domain" : "Releaseability",
-        "keys" : [
+        "domain": "Releaseability",
+        "keys": [
             "alert_status",
             "quality_gate_details"
-        ]
+        ],
+        "tranformKeys": {
+            "alert_status": {
+                "OK": 0
+                "ERROR": 1
+            }
+        }
     }
 ]
