@@ -90,5 +90,24 @@ SUPPORTED_KEYS = [
             "false_positive_issues",
             "wont_fix_issues"
         ]
+    },
+    {
+        "domain" : "Complexity",
+        "keys" : [
+            "complexity",
+            "cognitive_complexity",
+            "class_complexity",
+            "file_complexity",
+            "function_complexity",
+            "complexity_in_classes",
+            "complexity_in_functions"
+        ]
+    },
+    {
+        "domain" : "Releaseability",
+        "keys" : [
+            "alert_status",
+            "quality_gate_details"
+        ]
     }
 ]
