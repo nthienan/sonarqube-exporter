@@ -112,6 +112,7 @@ class SonarQubeCollector:
         logging.info("Intitializing ")
         self._metrics = {}
         raw_metrics = self._sonar_client.get_all_metrics()["metrics"]
+        logging.info("raw metrics: %s" % raw_metrics)
         for raw_metric in raw_metrics:
             metric = Metric()
             for supported_m in CONF.supported_keys:
