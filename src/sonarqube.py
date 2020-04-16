@@ -109,15 +109,12 @@ class SonarQubeCollector:
         self._cached_metrics = []
 
         # initialize gauges
-        logging.info("Intitializing ")
+        logging.info("Intitializing...")
         self._metrics = {}
         raw_metrics = self._sonar_client.get_all_metrics()["metrics"]
-        logging.info("raw metrics: %s" % raw_metrics)
         for raw_metric in raw_metrics:
             metric = Metric()
-            logging.info("raw metric: %s " % raw_metric["key"])
             for supported_m in CONF.supported_keys:
-                logging.info("supported_m: %s " % supported_m["keys"])
                 if "domain" in raw_metric and raw_metric["domain"] == supported_m["domain"] and raw_metric["key"] in supported_m["keys"]:
                     metric.domain = raw_metric["domain"]
                     metric.key = raw_metric["key"]
@@ -126,19 +123,16 @@ class SonarQubeCollector:
                         metric.description = raw_metric["description"]
                     else:
                         metric.description = raw_metric["name"]
-                    if raw_metric["key"] == "alert_status":
-                        logging.debug("found it")
                     if "tranformKeys" in supported_m and raw_metric["key"] in supported_m["tranformKeys"].keys():
-                        logging.info("Tranform: %s " % raw_metric["key"])
                         metric.tranform = True
                         metric.tranform_map = supported_m["tranformKeys"][raw_metric["key"]]
-
                     self._metrics[metric.key] = metric
         self._queried_metrics = str()
         self._gauges = {}
         for key, m in self._metrics.items():
             self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=("id", "key", "name", "domain", "type"))
             self._queried_metrics = "{},{}".format(m.key, self._queried_metrics)
+        logging.info("Initialized %s metrics." % len(self._metrics.keys()))
 
     def collect(self):
         return self._cached_metrics
@@ -152,9 +146,7 @@ class SonarQubeCollector:
                 value = measure["value"]
                 m = self._metrics[measure["metric"]]
                 if m.tranform:
-                    logging.info("tranform value for: %s " % m.key)
                     value = m.tranform_map[measure["value"]]
-                    logging.info("value: %s " % value)
                 gauge = self._gauges[measure["metric"]]
                 gauge.labels(p["id"], p["key"], p["name"], m.domain, m.type).set(value)
 
