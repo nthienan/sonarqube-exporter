@@ -115,7 +115,9 @@ class SonarQubeCollector:
         logging.info("raw metrics: %s" % raw_metrics)
         for raw_metric in raw_metrics:
             metric = Metric()
+            logging.info("raw metric: %s " % raw_metric["key"])
             for supported_m in CONF.supported_keys:
+                logging.info("supported_m: %s " % supported_m["keys"])
                 if "domain" in raw_metric and raw_metric["domain"] == supported_m["domain"] and raw_metric["key"] in supported_m["keys"]:
                     metric.domain = raw_metric["domain"]
                     metric.key = raw_metric["key"]
@@ -124,7 +126,6 @@ class SonarQubeCollector:
                         metric.description = raw_metric["description"]
                     else:
                         metric.description = raw_metric["name"]
-                    logging.info(raw_metric["key"])
                     if raw_metric["key"] == "alert_status":
                         logging.debug("found it")
                     if "tranformKeys" in supported_m and raw_metric["key"] in supported_m["tranformKeys"].keys():

@@ -104,7 +104,7 @@ SUPPORTED_KEYS = [
         ]
     },
     {
-        "domain": "Releaseability",
+        "domain": "Releasability",
         "keys": [
             "alert_status",
             "quality_gate_details"
