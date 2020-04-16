@@ -123,6 +123,7 @@ class SonarQubeCollector:
                         metric.description = raw_metric["description"]
                     else:
                         metric.description = raw_metric["name"]
+                    logging.info(raw_metric["key"])
                     if raw_metric["key"] == "alert_status":
                         logging.debug("found it")
                     if "tranformKeys" in supported_m and raw_metric["key"] in supported_m["tranformKeys"].keys():
