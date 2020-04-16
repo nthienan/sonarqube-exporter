@@ -123,7 +123,10 @@ class SonarQubeCollector:
                         metric.description = raw_metric["description"]
                     else:
                         metric.description = raw_metric["name"]
+                    if raw_metric["key"] == "alert_status":
+                        logging.debug("found it")
                     if "tranformKeys" in supported_m and raw_metric["key"] in supported_m["tranformKeys"].keys():
+                        logging.info("Tranform: %s " % raw_metric["key"])
                         metric.tranform = True
                         metric.tranform_map = supported_m["tranformKeys"][raw_metric["key"]]
 
@@ -146,7 +149,9 @@ class SonarQubeCollector:
                 value = measure["value"]
                 m = self._metrics[measure["metric"]]
                 if m.tranform:
+                    logging.info("tranform value for: %s " % m.key)
                     value = m.tranform_map[measure["value"]]
+                    logging.info("value: %s " % value)
                 gauge = self._gauges[measure["metric"]]
                 gauge.labels(p["id"], p["key"], p["name"], m.domain, m.type).set(value)
 
