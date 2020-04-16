@@ -123,7 +123,7 @@ class SonarQubeCollector:
                         metric.description = raw_metric["description"]
                     else:
                         metric.description = raw_metric["name"]
-                    if raw_metric["key"] in supported_m["tranformKeys"].keys():
+                    if "tranformKeys" in supported_m and raw_metric["key"] in supported_m["tranformKeys"].keys():
                         metric.tranform = True
                         metric.tranform_map = supported_m["tranformKeys"][raw_metric["key"]]
 
