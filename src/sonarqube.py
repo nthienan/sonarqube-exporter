@@ -24,13 +24,13 @@ class SonarQubeClient:
         res.raise_for_status()
         return res.json()
 
-    def get_all_projects(self):
-        return self._request(endpoint="api/components/search?qualifiers=TRK")
+    def get_projects(self, page_index=1, page_size=100):
+        return self._request(endpoint="api/components/search?qualifiers=TRK&p={}&ps={}".format(page_index, page_size))
 
-    def get_all_metrics(self):
+    def get_metrics(self):
         return self._request(endpoint="api/metrics/search")
 
-    def get_measures_component(self, component_key, metric_key):
+    def get_measures(self, component_key, metric_key):
         return self._request(endpoint="api/measures/component?component={}&metricKeys={}".format(component_key, metric_key))
 
 
@@ -111,7 +111,7 @@ class SonarQubeCollector:
         # initialize gauges
         logging.info("Intitializing...")
         self._metrics = {}
-        raw_metrics = self._sonar_client.get_all_metrics()["metrics"]
+        raw_metrics = self._sonar_client.get_metrics()["metrics"]
         for raw_metric in raw_metrics:
             metric = Metric()
             for supported_m in CONF.supported_keys:
@@ -139,17 +139,25 @@ class SonarQubeCollector:
 
     def run(self):
         logging.info("Collecting data from SonarQube...")
-        projects  = self._sonar_client.get_all_projects()["components"]
-        for p in projects:
-            measures = self._sonar_client.get_measures_component(component_key=p["key"], metric_key=self._queried_metrics)["component"]["measures"]
-            for measure in measures:
-                value = measure["value"]
-                m = self._metrics[measure["metric"]]
-                if m.tranform:
-                    value = m.tranform_map[measure["value"]]
-                gauge = self._gauges[measure["metric"]]
-                gauge.labels(p["id"], p["key"], p["name"], m.domain, m.type).set(value)
-
+        response  = self._sonar_client.get_projects()
+        total_projects = int(response['paging']['total'])
+        logging.debug("There are %s projects in SonarQube" % total_projects)
+        processed_projects = 0
+        page_index = 1
+        while processed_projects < total_projects:
+            projects  = self._sonar_client.get_projects(page_index=page_index)["components"]
+            for p in projects:
+                measures = self._sonar_client.get_measures(component_key=p["key"], metric_key=self._queried_metrics)["component"]["measures"]
+                for measure in measures:
+                    value = measure["value"]
+                    m = self._metrics[measure["metric"]]
+                    if m.tranform:
+                        value = m.tranform_map[measure["value"]]
+                    gauge = self._gauges[measure["metric"]]
+                    gauge.labels(p["id"], p["key"], p["name"], m.domain, m.type).set(value)
+                processed_projects += processed_projects
+            page_index += 1
+            logging.debug("{} projects were processed, {} project remaining".format(processed_projects, (total_projects - processed_projects)))
         data = []
         for key, g in self._gauges.items():
             data.extend(g.collect())
