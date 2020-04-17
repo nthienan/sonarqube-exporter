@@ -5,7 +5,7 @@ services:
 env:
   global:
     - IMAGE_NAME=nthienan/sonarqube-exporter
-    - VERSION=0.5.0
+    - VERSION=0.5.1
 install: true
 
 before_script:

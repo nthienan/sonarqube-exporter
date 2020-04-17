@@ -141,7 +141,7 @@ class SonarQubeCollector:
         logging.info("Collecting data from SonarQube...")
         response  = self._sonar_client.get_projects()
         total_projects = int(response['paging']['total'])
-        logging.debug("There are %s projects in SonarQube" % total_projects)
+        logging.info("There are %s projects in SonarQube" % total_projects)
         processed_projects = 0
         page_index = 1
         while processed_projects < total_projects:
@@ -157,7 +157,7 @@ class SonarQubeCollector:
                     gauge.labels(p["id"], p["key"], p["name"], m.domain, m.type).set(value)
                 processed_projects += processed_projects
             page_index += 1
-            logging.debug("{} projects were processed, {} project remaining".format(processed_projects, (total_projects - processed_projects)))
+            logging.info("{} projects were processed, {} project remaining".format(processed_projects, (total_projects - processed_projects)))
         data = []
         for key, g in self._gauges.items():
             data.extend(g.collect())
