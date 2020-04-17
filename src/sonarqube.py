@@ -129,12 +129,12 @@ class SonarQubeCollector:
                     self._metrics[metric.key] = metric
         self._queried_metrics = str()
         self._gauges = {}
-        labels = ["id", "key", "name", "domain", "type"]
+        labels = ("id", "key", "name", "domain", "type")
         for key, m in self._metrics.items():
             if m.tranform:
-                self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=labels.append("value"))
+                self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=("id", "key", "name", "domain", "type", "value"))
             else:
-                self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=labels)
+                self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=("id", "key", "name", "domain", "type"))
             self._queried_metrics = "{},{}".format(m.key, self._queried_metrics)
         logging.info("Initialized %s metrics." % len(self._metrics.keys()))
 
