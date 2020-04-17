@@ -155,7 +155,7 @@ class SonarQubeCollector:
                         value = m.tranform_map[measure["value"]]
                     gauge = self._gauges[measure["metric"]]
                     gauge.labels(p["id"], p["key"], p["name"], m.domain, m.type).set(value)
-                processed_projects += processed_projects
+                processed_projects += 1
             page_index += 1
             logging.info("{} projects were processed, {} project remaining".format(processed_projects, (total_projects - processed_projects)))
         data = []
