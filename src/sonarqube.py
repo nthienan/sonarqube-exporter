@@ -129,8 +129,12 @@ class SonarQubeCollector:
                     self._metrics[metric.key] = metric
         self._queried_metrics = str()
         self._gauges = {}
+        labels = ["id", "key", "name", "domain", "type"]
         for key, m in self._metrics.items():
-            self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=("id", "key", "name", "domain", "type"))
+            if m.tranform:
+                self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=labels.append("value"))
+            else:
+                self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=labels)
             self._queried_metrics = "{},{}".format(m.key, self._queried_metrics)
         logging.info("Initialized %s metrics." % len(self._metrics.keys()))
 
@@ -149,12 +153,14 @@ class SonarQubeCollector:
             for p in projects:
                 measures = self._sonar_client.get_measures(component_key=p["key"], metric_key=self._queried_metrics)["component"]["measures"]
                 for measure in measures:
-                    value = measure["value"]
                     m = self._metrics[measure["metric"]]
+                    value = measure["value"]
+                    gauge = self._gauges[measure["metric"]]
                     if m.tranform:
                         value = m.tranform_map[measure["value"]]
-                    gauge = self._gauges[measure["metric"]]
-                    gauge.labels(p["id"], p["key"], p["name"], m.domain, m.type).set(value)
+                        gauge.labels(p["id"], p["key"], p["name"], m.domain, m.type, measure["value"]).set(value)
+                    else:
+                        gauge.labels(p["id"], p["key"], p["name"], m.domain, m.type).set(value)
                 processed_projects += 1
             page_index += 1
             logging.info("{} projects were processed, {} project remaining".format(processed_projects, (total_projects - processed_projects)))
