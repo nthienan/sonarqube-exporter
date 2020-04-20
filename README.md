@@ -65,7 +65,7 @@ sonar_violations{domain="Issues",id="AW-NxaX2uqnNHCRHu3Px",key="sample-project",
 ```
 
 Overview dashboard:
-![Overview dashboard](images/overview.png "Overview dashboard")
+![Overview dashboard](images/overview_1.png "Overview dashboard")
 
 Details dashboard:
 ![Details dashboard](images/details.jpg "Details dashboard")
