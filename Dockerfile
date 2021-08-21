@@ -8,7 +8,7 @@ EXPOSE 8998
 
 RUN apk --no-cache update && \
     apk --no-cache upgrade && \
-    apk --no-cache add tzdata python3 && \
+    apk --no-cache add bash tzdata python3 && \
     python3 -m ensurepip && \
     rm -r /usr/lib/python*/ensurepip && \
     pip3 install --upgrade pip setuptools && \
@@ -21,4 +21,6 @@ COPY --from=builder /usr/src/app/dist/sqe*.whl .
 RUN pip install --no-cache-dir sqe*.whl && \
     rm -f sqe*.whl
 
-ENTRYPOINT ["sqe"]
+COPY ./entrypoint.sh /usr/app/src/entrypoint.sh
+
+ENTRYPOINT ["/usr/app/src/entrypoint.sh"]

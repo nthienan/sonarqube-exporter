@@ -17,11 +17,11 @@ optional arguments:
   --log-level LOG_LEVEL
                         Log level. It can be DEBUG, INFO, WARNING, ERROR,
                         CRITICAL. Default is INFO
-  --port PORT, -p PORT  The port that JAE will listen on. Default is 8998
+  --port PORT, -p PORT  The port that SQE will listen on. Default is 8999
 ```
 Docker:
 ```bash
-docker run -d -p 8999:8999 nthienan/sonarqube-exporter --storage-info --users --url https://sonarqube.example.com --user-token <USER_TOKEN>
+docker run -d -p 8999:8999 nthienan/sonarqube-exporter sqe --url https://sonarqube.example.com --user-token <USER_TOKEN>
 ```
 Metrics:
 ```

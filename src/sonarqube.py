@@ -129,12 +129,11 @@ class SonarQubeCollector:
                     self._metrics[metric.key] = metric
         self._queried_metrics = str()
         self._gauges = {}
-        labels = ("id", "key", "name", "domain", "type")
-        for key, m in self._metrics.items():
+        for _, m in self._metrics.items():
             if m.tranform:
-                self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=("id", "key", "name", "domain", "type", "value"))
+                self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=("key", "name", "domain", "type", "value"))
             else:
-                self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=("id", "key", "name", "domain", "type"))
+                self._gauges[m.key] = Gauge (name="sonar_{}".format(m.key), documentation=m.description, labelnames=("key", "name", "domain", "type"))
             self._queried_metrics = "{},{}".format(m.key, self._queried_metrics)
         logging.info("Initialized %s metrics." % len(self._metrics.keys()))
 
@@ -158,9 +157,9 @@ class SonarQubeCollector:
                     gauge = self._gauges[measure["metric"]]
                     if m.tranform:
                         value = m.tranform_map[measure["value"]]
-                        gauge.labels(p["id"], p["key"], p["name"], m.domain, m.type, measure["value"]).set(value)
+                        gauge.labels(p["key"], p["name"], m.domain, m.type, measure["value"]).set(value)
                     else:
-                        gauge.labels(p["id"], p["key"], p["name"], m.domain, m.type).set(value)
+                        gauge.labels(p["key"], p["name"], m.domain, m.type).set(value)
                 processed_projects += 1
             page_index += 1
             logging.info("{} projects were processed, {} project remaining".format(processed_projects, (total_projects - processed_projects)))
